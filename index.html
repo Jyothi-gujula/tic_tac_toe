@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg, #f7c5e3, #f0f0f0);
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .player-input {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .player-section {
+      width: 45%;
+      text-align: center;
+    }
+
+    .player-section img {
+      max-width: 100px;
+      max-height: 100px;
+      border-radius: 12px;
+    }
+
+    .player-section input {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 20px;
+      margin-top: 10px;
+      outline: none;
+      transition: border 0.3s ease;
+    }
+
+    .player-section input:focus {
+      border: 2px solid #4CAF50;
+    }
+
+    .win-record {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .win-record h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .win-record p {
+      margin: 5px 0;
+      font-size: 18px;
+    }
+
+    .win-record span {
+      font-size: 20px;
+      font-weight: bold;
+      color: #4CAF50;
+    }
+
+    #startGame {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 20px;
+    }
+
+    .tic-tac-toe {
+      width: 300px;
+      margin: 20px auto;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border: 2px solid #ccc;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .cell:hover {
+      background-color: #e0e0e0;
+    }
+
+    .game-start {
+      display: none;
+    }
+
+    .game-start img {
+      width: 300px;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    .winning-image {
+      width: 100px;
+      height: auto;
+      border-radius: 10px;
+      margin: 10px auto;
+    }
+
+    .winning-cell {
+      animation: pulse 0.5s ease-out;
+      background-color: lightgreen;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Name Entry Page -->
+    <div id="nameEntry" class="player-input">
+      <div class="player-section">
+        <img src="https://thumbs.dreamstime.com/b/cartoon-illustration-fierce-lion-character-casual-attire-ready-action-strikes-confident-pose-329909243.jpg" alt="Player 1 - Lion">
+        <h2>Player 1</h2>
+        <input type="text" id="playerXName" placeholder="Enter Player X Name">
+      </div>
+      <div class="player-section">
+        <img src="https://img.freepik.com/premium-photo/anime-character-with-tiger-like-body-claws-holding-knife-generative-ai_927978-21184.jpg?w=740" alt="Player 2 - Tiger">
+        <h2>Player 2</h2>
+        <input type="text" id="playerOName" placeholder="Enter Player O Name">
+      </div>
+    </div>
+    <button id="startGame">Start Game</button>
+
+    <div id="gameStartScreen" class="game-start">
+      <h3 id="countdown">Game starts in 3</h3>
+    </div>
+    
+    <script>
+      let count = 3;
+      const countdownElement = document.getElementById("countdown");
+    
+      const countdownInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          countdownElement.textContent = `Game starts in ${count}`;
+        } else {
+          countdownElement.textContent = "Go!";
+          clearInterval(countdownInterval);
+        }
+      }, 1000);
+    </script>
+    
+
+    <!-- Tic Tac Toe Game -->
+    <div id="gameArea" class="hidden">
+      <h2>Tic Tac Toe</h2>
+      <div id="turnIndicator">Player X's turn</div>
+
+      <!-- Win Record Section -->
+      <div id="winRecord" class="win-record">
+        <h3>Win Record</h3>
+        <p>Player 1 (X): <span id="player1Wins">0</span></p>
+        <p>Player 2 (O): <span id="player2Wins">0</span></p>
+      </div>
+
+      <div class="board">
+        <div class="cell" id="cell0"></div>
+        <div class="cell" id="cell1"></div>
+        <div class="cell" id="cell2"></div>
+        <div class="cell" id="cell3"></div>
+        <div class="cell" id="cell4"></div>
+        <div class="cell" id="cell5"></div>
+        <div class="cell" id="cell6"></div>
+        <div class="cell" id="cell7"></div>
+        <div class="cell" id="cell8"></div>
+      </div>
+
+      <div id="winnerDisplay" class="hidden">
+        <h3 id="winnerName"></h3>
+        <img id="winImage" class="winning-image" alt="Winning Image">
+      </div>
+
+      <button id="resetButton">Reset Game</button>
+    </div>
+  </div>
+
+  <script>
+    const startGameButton = document.getElementById('startGame');
+    const gameStartScreen = document.getElementById('gameStartScreen');
+    const nameEntry = document.getElementById('nameEntry');
+    const gameArea = document.getElementById('gameArea');
+    const turnIndicator = document.getElementById('turnIndicator');
+    const resetButton = document.getElementById('resetButton');
+    const winImage = document.getElementById('winImage');
+    const cells = document.querySelectorAll('.cell');
+
+    let playerXName = '';
+    let playerOName = '';
+    let gameBoard = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X';
+    let gameActive = true;
+
+    let player1Wins = 0;
+    let player2Wins = 0;
+
+    // Update the win count display
+    const updateWinRecord = () => {
+      document.getElementById('player1Wins').textContent = player1Wins;
+      document.getElementById('player2Wins').textContent = player2Wins;
+    };
+
+    // Start game and display "Game Starts" screen
+    startGameButton.addEventListener('click', () => {
+      playerXName = document.getElementById('playerXName').value.trim();
+      playerOName = document.getElementById('playerOName').value.trim();
+
+      if (!playerXName || !playerOName) {
+        alert('Please enter both player names!');
+        return;
+      }
+
+      nameEntry.classList.add('hidden');
+      gameStartScreen.style.display = 'block';
+
+      setTimeout(() => {
+        gameStartScreen.style.display = 'none';
+        gameArea.classList.remove('hidden');
+        turnIndicator.textContent = `${playerXName}'s turn`;
+      }, 2000);
+    });
+
+    // Check for win
+    const checkWin = () => {
+      const winPatterns = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+        [0, 4, 8], [2, 4, 6]            // Diagonals
+      ];
+
+      for (const pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+          return pattern;
+        }
+      }
+      return null;
+    };
+
+    // Handle cell clicks
+    cells.forEach((cell, index) => {
+      cell.addEventListener('click', () => {
+        if (!gameBoard[index] && gameActive) {
+          gameBoard[index] = currentPlayer;
+          cell.textContent = currentPlayer;
+
+          const winningPattern = checkWin();
+          if (winningPattern) {
+            gameActive = false;
+            winningPattern.forEach(i => cells[i].classList.add('winning-cell'));
+
+            const winnerName = currentPlayer === 'X' ? playerXName : playerOName;
+            turnIndicator.classList.add('hidden');
+            const winnerDisplay = document.getElementById('winnerDisplay');
+            const winnerNameElement = document.getElementById('winnerName');
+
+            winnerNameElement.textContent = `${winnerName} wins!`;
+            winImage.src = currentPlayer === 'X'
+              ? 'https://thumbs.dreamstime.com/b/cartoon-illustration-fierce-lion-character-casual-attire-ready-action-strikes-confident-pose-329909243.jpg'
+              : 'https://img.freepik.com/premium-photo/anime-character-with-tiger-like-body-claws-holding-knife-generative-ai_927978-21184.jpg';
+
+            winnerDisplay.classList.remove('hidden');
+
+            // Update the win count
+            if (currentPlayer === 'X') {
+              player1Wins++;
+            } else {
+              player2Wins++;
+            }
+            updateWinRecord();
+          } else if (!gameBoard.includes('')) {
+            gameActive = false;
+            turnIndicator.textContent = "It's a tie!";
+          } else {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            turnIndicator.textContent = `${currentPlayer === 'X' ? playerXName : playerOName}'s turn`;
+          }
+        }
+      });
+    });
+
+    // Reset game
+    resetButton.addEventListener('click', () => {
+      gameBoard = ['', '', '', '', '', '', '', '', ''];
+      cells.forEach(cell => {
+        cell.textContent = '';
+        cell.classList.remove('winning-cell');
+      });
+      winImage.src = ''; // Clear the image after reset
+      document.getElementById('winnerDisplay').classList.add('hidden');
+      gameActive = true;
+      currentPlayer = 'X';
+      turnIndicator.classList.remove('hidden');
+      turnIndicator.textContent = `${playerXName}'s turn`;
+    });
+  </script>
+</body>
+</html>
